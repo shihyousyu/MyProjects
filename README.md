@@ -12,22 +12,16 @@ This project is a simulator of the Enigma machine used during World War II. It a
 - Rotors automatically step with a simple notch turnover simulation.
 - Reset button to clear the current state and reset rotors.
 
-## How to Use
-
-1. Choose rotor types for **Rotor 1**, **Rotor 2**, and **Rotor 3** from the dropdown menus.
-2. Set the initial position (0–25) for each rotor.
-3. Enter plugboard pairs in the input box (e.g. `AB CD EF`).
-4. Click the on-screen keyboard buttons to input letters.
-5. The corresponding encrypted letter will light up on the lampboard.
-6. Click **Reset** to clear the state and start over.
-
-## Technologies
-
-- **HTML**, **CSS** for the user interface.
-- **JavaScript** for simulating the Enigma encryption logic, including rotors, reflector, and plugboard.
-- No external dependencies; runs fully in the browser.
+## Usage
+1. Select Rotor 1, Rotor 2, and Rotor 3 types from the dropdown menus.  
+2. Set the initial position (0–25) for each rotor.  
+3. Enter plugboard pairs in the input box (format: AB CD EF).  
+4. Click letters on the on-screen keyboard to input.  
+5. The encrypted letter will light up on the lampboard.  
+6. Click Reset to start over.
 
 ## Project Structure
+`C++ folder`  C++ Edition  
 `index.html`  Main page with the UI layout  
 `style.css`  Styles for layout, keyboard, lampboard, and controls  
 `enigma.js`  Enigma machine logic and UI interaction  
