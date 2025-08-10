@@ -169,12 +169,21 @@ keyboard.addEventListener('click', (e) => {
 });
 
 reset.addEventListener('click', () => {
-  enigmaMachine = null;
+  initEnigma();
   for(const row of key)
     for(const ltr of row)
       document.getElementById('lamp-' + ltr).classList.remove('on');
 
-  document.getElementById('rotor1-pos-display').textContent = document.getElementById('rotor1-pos').value || 0;
-  document.getElementById('rotor2-pos-display').textContent = document.getElementById('rotor2-pos').value || 0;
-  document.getElementById('rotor3-pos-display').textContent = document.getElementById('rotor3-pos').value || 0;
+  update();
 });
+
+// reset.addEventListener('click', () => {
+//   enigmaMachine = null;
+//   for(const row of key)
+//     for(const ltr of row)
+//       document.getElementById('lamp-' + ltr).classList.remove('on');
+
+//   document.getElementById('rotor1-pos-display').textContent = document.getElementById('rotor1-pos').value || 0;
+//   document.getElementById('rotor2-pos-display').textContent = document.getElementById('rotor2-pos').value || 0;
+//   document.getElementById('rotor3-pos-display').textContent = document.getElementById('rotor3-pos').value || 0;
+// });
