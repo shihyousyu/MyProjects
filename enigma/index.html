@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Enigma Machine</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="center">
+    <h1>ENIGMA MACHINE</h1>
+
+    <div id="settings">
+      <div class="rotors">
+        <label>Rotor 1:
+          <select id="rotor1-select">
+            <option value="0">0</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+          </select>
+          Pos:
+          <input id="rotor1-pos" type="number" min="0" max="25" value="0" />
+          <span id="rotor1-pos-display">0</span>
+        </label>
+
+        <label>Rotor 2:
+          <select id="rotor2-select">
+            <option value="0">0</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+          </select>
+          Pos:
+          <input id="rotor2-pos" type="number" min="0" max="25" value="0" />
+          <span id="rotor2-pos-display">0</span>
+        </label>
+
+        <label>Rotor 3:
+          <select id="rotor3-select">
+            <option value="0">0</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+          </select>
+          Pos:
+          <input id="rotor3-pos" type="number" min="0" max="25" value="0" />
+          <span id="rotor3-pos-display">0</span>
+        </label>
+      </div>
+
+      <div class="plugboard">
+        <label>Plugboard:
+          <input id="plugboard" type="text" placeholder="e.g. AB CD EF" />
+        </label>
+      </div>
+    </div>
+
+    <div id="lampboard"></div>
+    <div id="keyboard"></div>
+    <button id="reset-btn">Reset</button>
+  <script src="enigma.js"></script>
+</body>
+</html>

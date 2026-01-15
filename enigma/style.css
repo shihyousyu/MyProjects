@@ -1,0 +1,83 @@
+body{
+  background: #FFF;
+  color: #000;
+  font-family: sans-serif;
+  margin: 0;
+  padding: 20px;
+}
+
+.center{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  min-height: 100vh;
+}
+
+h1{
+  margin-bottom: 20px;
+}
+
+#settings{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.rotors{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+
+.plugboard{
+  margin-top: 10px;
+}
+
+#lampboard, #keyboard{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 10px 0;
+}
+
+.lampboard-row, .keyboard-row{
+  display: flex;
+  justify-content: center;
+  margin: 5px 0;
+}
+
+.lamp{
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #333;
+  color: #fff;
+  line-height: 30px;
+  margin: 2px;
+}
+
+.lamp.on{
+  background: yellow;
+  color: #000;
+}
+
+.key-btn{
+  width: 30px;
+  height: 30px;
+  margin: 2px;
+  cursor: pointer;
+}
+
+#display{
+  text-align: center;
+  margin-top: 20px;
+}
+
+#output-text{
+  width: 90%;
+  max-width: 600px;
+}
