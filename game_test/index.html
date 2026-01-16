@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8" />
+    <title>test</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: sans-serif;
+            background: skyblue; /* 備用背景色 */
+        }
+
+        #game {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            /* ***** 背景圖片已更新為 'background.jpg' ***** */
+            background-image: url("background.jpg"); /* 遊戲背景圖 */
+            background-size: cover; /* 圖片覆蓋整個容器，保持比例 */
+            background-repeat: no-repeat; /* 不重複 */
+            background-position: center; /* 圖片在容器中居中顯示 */
+            overflow: hidden; /* 重要：裁剪超出部分的內容 */
+        }
+
+        #ground {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 50px; /* 跑道高度 */
+            background-image: url('https://32comic.com/wp-content/uploads/2018/06/p51713882.jpg'); /* 地板圖片 */
+            background-repeat: repeat-x; /* 確保橫向重複，形成連續平面 */
+            background-size: auto 100%; /* 寬度自動，高度填滿跑道高度 */
+            z-index: 1; /* 比背景高 */
+        }
+
+        #player {
+            position: absolute;
+            width: 80px;  
+            height: 100px; 
+            
+            background-image: url('charactor.gif'); 
+            
+            background-size: contain; 
+            background-repeat: no-repeat; 
+            background-position: center bottom;
+            
+            bottom: 30px; 
+            left: 100px;
+            z-index: 2; 
+        }
+
+        #player.jump {
+            /* 跳躍動畫樣式 */
+        }
+
+        .obstacle-item {
+            position: absolute;
+            width: 80px;
+            height: 120px;
+            bottom: 35px; /* 讓樹木進一步下沉 */
+            background-image: url('https://png.pngtree.com/png-clipart/20220228/original/pngtree-pixel-art-green-tree-png-image_7325402.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center bottom;
+            z-index: 2;
+        }
+
+        .obstacle-item.tall {
+            height: 180px;
+        }
+
+        #scoreboard {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 24px;
+            color: white;
+            text-shadow: 1px 1px 3px #000;
+            user-select: none;
+            z-index: 10;
+        }
+
+        #game-over {
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 48px;
+            color: white;
+            display: none;
+            text-shadow: 2px 2px 4px #000;
+            user-select: none;
+            z-index: 10;
+        }
+
+        #restartButton {
+            position: absolute;
+            top: 60%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 15px 30px;
+            font-size: 28px;
+            font-weight: bold;
+            color: white;
+            background-color: #4CAF50;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.4);
+            display: none;
+            z-index: 10;
+            transition: background-color 0.2s ease;
+        }
+
+        #restartButton:hover {
+            background-color: #45a049;
+        }
+
+        #restartButton:active {
+            background-color: #3e8e41;
+            transform: translate(-50%, -50%) scale(0.98);
+        }
+    </style>
+</head>
+<body>
+    <div id="game">
+        <div id="ground"></div>
+        <div id="player"></div>
+        <div id="scoreboard">分數：0</div>
+        <div id="game-over">遊戲結束</div>
+        <button id="restartButton">重新開始</button>
+    </div>
+
+    <script>
+        const player = document.getElementById('player');
+        const gameDiv = document.getElementById('game');
+        const gameOver = document.getElementById('game-over');
+        const scoreboard = document.getElementById('scoreboard');
+        const groundElement = document.getElementById('ground');
+        const restartButton = document.getElementById('restartButton');
+
+        const groundHeight = 30; 
+        const playerInitialLeft = 100;
+
+        const jumpHeight = 250;
+        const totalJumpTime = 600;
+
+        const g = 8 * jumpHeight / (totalJumpTime * totalJumpTime);
+        const v0 = g * totalJumpTime / 2;
+
+        let isJumping = false;
+        let startTime = null;
+
+        let obstacles = [];
+        let obstacleSpeed = 0.8;
+        const accelerationInterval = 5000;
+        const speedIncrease = 0.1;
+
+        let lastFrameTime = null;
+        let gameOverFlag = false;
+        let score = 0;
+
+        let lastObstacleSpawnTime = 0;
+        const minTimeBetweenObstacles = 700;
+        const maxTimeBetweenObstacles = 1500;
+        let nextObstacleSpawnDelay = 0;
+
+        let groundPositionX = 0;
+
+        function restartGame() {
+            score = 0;
+            scoreboard.textContent = '分數：' + score;
+            gameOverFlag = false;
+            isJumping = false;
+            startTime = null;
+            lastFrameTime = null;
+            lastObstacleSpawnTime = 0;
+            nextObstacleSpawnDelay = 0;
+            obstacleSpeed = 0.8;
+
+            player.style.bottom = groundHeight + 'px'; 
+            player.style.left = playerInitialLeft + 'px';
+            player.classList.remove('jump');
+            player.style.animationPlayState = 'running';
+
+            obstacles.forEach(obs => obs.element.remove());
+            obstacles = [];
+
+            groundPositionX = 0;
+            groundElement.style.backgroundPositionX = '0px';
+            
+            gameOver.style.display = 'none';
+            restartButton.style.display = 'none';
+
+            requestAnimationFrame(moveObstacle);
+        }
+
+        restartButton.addEventListener('click', restartGame);
+
+
+        function triggerJump() {
+            if (!isJumping && !gameOverFlag) {
+                isJumping = true;
+                startTime = null;
+                requestAnimationFrame(jump);
+            }
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                triggerJump();
+            }
+        });
+
+        gameDiv.addEventListener('touchstart', (e) => {
+            e.preventDefault(); 
+            triggerJump();
+        });
+
+
+        function jump(timestamp) {
+            if (!startTime) {
+                startTime = timestamp;
+                player.classList.add('jump');
+            }
+            const elapsed = timestamp - startTime;
+
+            if (elapsed > totalJumpTime) {
+                player.style.bottom = groundHeight + 'px'; 
+                player.classList.remove('jump');
+                isJumping = false;
+                startTime = null;
+                return;
+            }
+
+            const t = elapsed;
+            const height = v0 * t - 0.5 * g * t * t;
+            player.style.bottom = groundHeight + height + 'px';
+
+            requestAnimationFrame(jump);
+        }
+
+        const gameWidth = window.innerWidth;
+        const obstacleWidth = 80;
+        const NORMAL_TREE_HEIGHT = 120;
+        const TALL_TREE_HEIGHT = 180;
+
+        function createObstacleElement(initialX, isTall = false) {
+            const newObstacle = document.createElement('div');
+            newObstacle.className = 'obstacle-item';
+            if (isTall) {
+                newObstacle.classList.add('tall');
+            }
+            newObstacle.style.left = initialX + 'px';
+            gameDiv.appendChild(newObstacle);
+            return newObstacle;
+        }
+
+        function moveObstacle(timestamp) {
+            if (gameOverFlag) {
+                return;
+            }
+
+            if (!lastFrameTime) lastFrameTime = timestamp;
+            const deltaTime = timestamp - lastFrameTime;
+            lastFrameTime = timestamp;
+
+            // 地面移動
+            groundPositionX -= obstacleSpeed * deltaTime;
+            groundElement.style.backgroundPositionX = groundPositionX + 'px';
+
+            for (let i = obstacles.length - 1; i >= 0; i--) {
+                const obs = obstacles[i];
+                obs.x -= obstacleSpeed * deltaTime;
+                obs.element.style.left = obs.x + 'px';
+
+                if (obs.x < -obstacleWidth) {
+                    obs.element.remove();
+                    obstacles.splice(i, 1);
+                    score++;
+                    scoreboard.textContent = '分數：' + score;
+                }
+            }
+
+            if (timestamp - lastObstacleSpawnTime > nextObstacleSpawnDelay) {
+                let numObstaclesToSpawn = 1;
+                const rand = Math.random();
+                if (rand < 0.4) {
+                    numObstaclesToSpawn = 2;
+                } else {
+                    numObstaclesToSpawn = 1;
+                }
+
+                const gapBetweenTwoTrees = 10;
+
+                if (numObstaclesToSpawn === 1) {
+                    const newObsElement = createObstacleElement(gameWidth);
+                    obstacles.push({ element: newObsElement, x: gameWidth });
+                } else if (numObstaclesToSpawn === 2) {
+                    const isFirstTall = Math.random() < 0.5;
+                    const isSecondTall = !isFirstTall;
+
+                    const firstObsElement = createObstacleElement(gameWidth, isFirstTall);
+                    const secondObsElement = createObstacleElement(gameWidth + obstacleWidth + gapBetweenTwoTrees, isSecondTall);
+                    
+                    obstacles.push({ element: firstObsElement, x: gameWidth });
+                    obstacles.push({ element: secondObsElement, x: gameWidth + obstacleWidth + gapBetweenTwoTrees });
+                }
+                
+                lastObstacleSpawnTime = timestamp;
+                nextObstacleSpawnDelay = Math.random() * (maxTimeBetweenObstacles - minTimeBetweenObstacles) + minTimeBetweenObstacles;
+            }
+
+            if (!gameOverFlag) {
+                requestAnimationFrame(moveObstacle);
+            }
+        }
+
+        function increaseSpeed() {
+            if (!gameOverFlag) {
+                obstacleSpeed += speedIncrease;
+                console.log("Speed increased to: " + obstacleSpeed.toFixed(2));
+            }
+        }
+
+        setInterval(() => {
+            if (!gameOverFlag) {
+                increaseSpeed();
+            }
+        }, accelerationInterval);
+
+        function checkCollision() {
+            const playerVisualRect = player.getBoundingClientRect();
+            const playerCollisionPaddingX = playerVisualRect.width * 0.2;
+            const playerCollisionPaddingY = playerVisualRect.height * 0.1;
+
+            const playerCollisionRect = {
+                left: playerVisualRect.left + playerCollisionPaddingX,
+                top: playerVisualRect.top + playerCollisionPaddingY,
+                right: playerVisualRect.right - playerCollisionPaddingX,
+                bottom: playerVisualRect.bottom - playerCollisionPaddingY
+            };
+
+            for (let i = 0; i < obstacles.length; i++) {
+                const obs = obstacles[i];
+                const obstacleVisualRect = obs.element.getBoundingClientRect();
+
+                const obstacleCollisionPaddingX = obstacleVisualRect.width * 0.3;
+                const obstacleCollisionPaddingY = obstacleVisualRect.height * 0.05;
+
+                const obstacleCollisionRect = {
+                    left: obstacleVisualRect.left + obstacleCollisionPaddingX,
+                    top: obstacleVisualRect.top + obstacleCollisionPaddingY,
+                    right: obstacleVisualRect.right - obstacleCollisionPaddingX,
+                    bottom: obstacleVisualRect.bottom - obstacleCollisionPaddingY
+                };
+
+                if (
+                    obstacleCollisionRect.left < playerCollisionRect.right &&
+                    obstacleCollisionRect.right > playerCollisionRect.left &&
+                    obstacleCollisionRect.top < playerCollisionRect.bottom &&
+                    obstacleCollisionRect.bottom > playerCollisionRect.top
+                ) {
+                    gameOverFlag = true;
+                    gameOver.style.display = 'block';
+                    restartButton.style.display = 'block';
+                    player.style.animationPlayState = 'paused';
+                    return;
+                }
+            }
+        }
+
+        setInterval(() => {
+            if (!gameOverFlag) checkCollision();
+        }, 1000 / 60);
+
+        requestAnimationFrame(moveObstacle);
+    </script>
+</body>
+</html>
