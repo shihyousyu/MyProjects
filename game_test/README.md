@@ -17,8 +17,7 @@ A side-scrolling runner game made by [@yants27](https://github.com/yants27) usin
 - **Jump**: Press the spacebar or tap anywhere on the screen
 
 ## How to Play
-Play on [link](https://shihyousyu.github.io/game_test/)
-
+Play on [link](https://shihyousyu.github.io/MyProjects/)
 ## License
 
 This project is licensed under the MIT License.
