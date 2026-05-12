@@ -25,3 +25,6 @@ I worked on this project during the summer after my first year of university, wh
 
 ## MyFirstVueProject (2025)
 This project was made in my second year of university while learning Vue.js.
+
+## On-Top-Browser (2025)
+A lightweight PyQt6 browser built on November 17, 2025. This project was created out of pure frustration when Spotify's mini-player failed me; I needed a browser that stays "On Top" while I work.
