@@ -33,10 +33,6 @@ All images in this project are generated using generative AI (GenAI) tools.
   - Project development continued under [@shihyousyu] from this point onward.
   - Added the Dev Log section directly into the README for easier tracking of development progress.
 
-### 2025-06-03
-- @yants27:
-  - Created the initial README.md with project title only.
-
 ### 2025-05-25 and earlier
 - @yants27:
   - Developed the initial version of the endless runner game.
